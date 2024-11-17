@@ -15,8 +15,8 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-df1 = pd.read_csv('/content/drive/MyDrive/test_Anamoly.csv')
-df2 = pd.read_csv('/content/drive/MyDrive/train_Anamoly.csv')
+df1 = pd.read_csv('/content/test_Anamoly.csv')
+df2 = pd.read_csv('/content/train_Anamoly.csv')
 
 df1.head()
 df1.tail()
