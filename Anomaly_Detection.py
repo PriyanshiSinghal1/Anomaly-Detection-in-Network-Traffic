@@ -1,71 +1,53 @@
-# importing libraries 
-
 import pandas as pd
 import numpy as np
-from sklearn.neighbors import LocalOutlierFactor
-from sklearn.svm import OneClassSVM
-import seaborn as sns
-import tensorflow as tf
-import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
 from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
+import warnings
 
-df1 = pd.read_csv('/content/test_Anamoly.csv')
-df2 = pd.read_csv('/content/train_Anamoly.csv')
+# Ignore warnings
+warnings.filterwarnings('ignore')
 
-df1.head()
-df1.tail()
+# Load the datasets
+train_df = pd.read_csv('/content/train (1).csv')
+test_df = pd.read_csv('/content/test.csv')
 
-df2.head()
-df2.tail()
+# Display the first few rows of the train dataset
+print(train_df.head())
 
-print(df1.isnull().sum())
+# Preprocess the data
+# We will use the 'value' column to train the model
+X_train = train_df[['value']].values
+X_test = test_df[['value']].values
 
-print(df2.isnull().sum())
+# Initialize the model
+model = IsolationForest(contamination=0.01)
 
-"""##NORMALIZE THE DATA"""
+# Fit the model on the training data
+model.fit(X_train)
 
-scaler = StandardScaler()
-data_normalized = scaler.fit_transform(df2)
+# Predict anomalies on the test data
+test_df['is_anomaly'] = model.predict(X_test)
 
-corr=df2.corr()
+# Convert predictions: -1 (anomaly) to 1, and 1 (normal) to 0
+test_df['is_anomaly'] = test_df['is_anomaly'].map({-1: 1, 1: 0})
 
-y_train = df2["is_anomaly"]
-label_encoder = LabelEncoder()
-y_train = label_encoder.fit_transform(y_train)
+# Prepare the submission file
+submission_df = test_df[['timestamp', 'is_anomaly']]
+submission_df.to_csv('/content/Submission (1).csv', index=False)
 
-features = ["value", "predicted"]
-x_train = df2[features]
+# Evaluate the model
+# We need the ground truth values to calculate the F1 score
+# Assuming 'is_anomaly' in the test data is the ground truth
+y_true = test_df['is_anomaly'].values
+y_pred = model.predict(X_test)
+y_pred = np.where(y_pred == -1, 1, 0)
 
-plt.figure(figsize=(10, 6))
-plt.scatter(x_train["value"][y_train == 0], x_train["predicted"][y_train == 0], c='blue', marker='s', label="Normal")
-plt.scatter(x_train["value"][y_train == 1], x_train["predicted"][y_train == 1], c='red', marker='x', label="Anomaly")
-plt.title("Training Data: Normal vs Anomaly")
-plt.xlabel("Value")
-plt.ylabel("Predicted")
-plt.legend()
-plt.grid(True)
-plt.show()
+# Calculate F1 score
+f1 = f1_score(y_true, y_pred)
+print(f"F1 Score: {f1}")
 
-random_forest = RandomForestClassifier(n_jobs=-1)
-random_forest.fit(x_train, y_train)
+# Display the first few rows of the submission file
+print(submission_df.head())
 
-x_test = df1[features]
-predictions = random_forest.predict(x_test)
-
-submission = pd.read_csv('/content/Submission_Anamoly.csv')
-
-inv_predictions = label_encoder.inverse_transform(predictions)
-
-results = pd.DataFrame({
-    "timestamp": df1["timestamp"],
-    "is_anomaly": inv_predictions
-})
-results
-
-results.to_csv("Submission_Anamoly.csv", index=False)
+# Display the entire submission file for verification (optional)
+print(submission_df)
