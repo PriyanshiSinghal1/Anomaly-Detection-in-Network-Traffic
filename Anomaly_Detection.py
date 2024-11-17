@@ -58,7 +58,7 @@ random_forest.fit(x_train, y_train)
 x_test = df1[features]
 predictions = random_forest.predict(x_test)
 
-submission = pd.read_csv('/content/drive/MyDrive/Submission_Anamoly.csv')
+submission = pd.read_csv('/content/Submission_Anamoly.csv')
 
 inv_predictions = label_encoder.inverse_transform(predictions)
 
