@@ -1,9 +1,12 @@
 # Anomaly-Detection-in-Network-Traffic
 
-Welcome to the Celebal Celebal Technologies Data Science Final Project repository!The aim of this project is to detect unusual patterns or anomalies in network traffic data, which could indicate potential security breaches or system malfunctions. Two approaches are used for anomaly detection:
+Welcome to the Celebal Celebal Technologies Data Science Final Project repository!The aim of this project is to detect unusual patterns or anomalies in network traffic data, which could indicate potential security breaches or system malfunctions. 
 
-  i) Isolation Forest
-  ii) Autoencoder
+Approach used for anomaly detection:
+  • Isolation Forest
+
+Metrics used to evaluate model's performance:
+  • F1 Score
 
 
   
